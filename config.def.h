@@ -31,12 +31,13 @@ static Bool hidebackground  = FALSE;
 /* DOWNLOAD(URI, referer) */
 #define DOWNLOAD(d, r) { \
 	.v = (char *[]){ "/bin/sh", "-c", \
-		"st -e /bin/sh -c \"wget '$0'" \
-		" --load-cookies ~/.surf/cookies.txt" \
-		" --user-agent '$1'" \
-		" --referer '$2' ; sleep 5\"", d, useragent, r, NULL \
-	} \
-}
+	"lxterminal -e \"/bin/sh -c \\\"sed s/^#HttpOnly_// ~/.surf/cookies.txt > \
+		~/.surf/curl_cookies.txt; \
+		curl --cookie ~/.surf/curl_cookies.txt \
+		--user-agent '$1' '$0' --remote-header-name -O; \
+		rm -f ~/.surf/curl_cookies.txt; \
+		echo Hit return...; \
+		read \\\"\"", d, useragent, NULL } }
 
 #define MODKEY GDK_CONTROL_MASK
 
