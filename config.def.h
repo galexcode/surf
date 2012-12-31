@@ -11,6 +11,7 @@ static char *progress_proxy_untrust = "#FF6600";
 static char *stylefile      = "~/.surf/style.css";
 static char *scriptfile     = "~/.surf/script.js";
 static char *cookiefile     = "~/.surf/cookies.txt";
+static char *filterfile     = "~/.surf/filter.txt";
 static time_t sessiontime   = 3600;
 static char *cafile         = "/etc/ssl/certs/ca-certificates.crt";
 static char *strictssl      = FALSE; /* Refuse untrusted SSL connections */
