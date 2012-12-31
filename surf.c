@@ -22,7 +22,6 @@
 #include <sys/file.h>
 
 #include "arg.h"
-#include "filter.h"
 
 char *argv0;
 
