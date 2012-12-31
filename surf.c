@@ -153,7 +153,7 @@ static void usage(void);
 static void windowobjectcleared(GtkWidget *w, WebKitWebFrame *frame,
 		JSContextRef js, JSObjectRef win, Client *c);
 static void zoom(Client *c, const Arg *arg);
-static void external(Client *c);
+static void external(Client *c, const Arg *arg);
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -1088,7 +1088,7 @@ zoom(Client *c, const Arg *arg) {
 }
 
 void
-external(Client *c) {
+external(Client *c, const Arg *arg) {
 	const char * uri = geturi(c);
 	printf("%s\n", uri);
 
