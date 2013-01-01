@@ -29,6 +29,14 @@ char *argv0;
 #define COOKIEJAR_TYPE          (cookiejar_get_type ())
 #define COOKIEJAR(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), COOKIEJAR_TYPE, CookieJar))
 
+#define COLOR_RED     "\x1b[31m"
+#define COLOR_GREEN   "\x1b[32m"
+#define COLOR_YELLOW  "\x1b[33m"
+#define COLOR_BLUE    "\x1b[34m"
+#define COLOR_MAGENTA "\x1b[35m"
+#define COLOR_CYAN    "\x1b[36m"
+#define COLOR_RESET   "\x1b[0m"
+
 enum { AtomFind, AtomGo, AtomUri, AtomLast };
 
 typedef union Arg Arg;
@@ -80,7 +88,7 @@ static GdkNativeWindow embed = 0;
 static gboolean showxid = FALSE;
 static char winid[64];
 static gboolean loadimages = 1, enableplugins = 1, enablescripts = 1,
-		usingproxy = 0;
+		usingproxy = 0, logurls = 0;
 static char togglestat[5];
 
 static void beforerequest(WebKitWebView *w, WebKitWebFrame *f,
@@ -176,10 +184,20 @@ beforerequest(WebKitWebView *w, WebKitWebFrame *f, WebKitWebResource *r,
 		WebKitNetworkRequest *req, WebKitNetworkResponse *resp,
 		gpointer d) {
 	const gchar *uri = webkit_network_request_get_uri(req);
-	if (filter_match_any(uri)) {
-		/* If filter matches, prevent page from loading */
-		webkit_network_request_set_uri(req, "about:blank");
-	} 
+	if (logurls) {
+		if (filter_match_any(uri)) {
+			/* If filter matches, prevent page from loading */
+			printf("%sLoading \"%s\"  ->  blocked%s\n", COLOR_RED, uri, COLOR_RESET);
+			webkit_network_request_set_uri(req, "about:blank");
+		} else {
+			printf("%sLoading \"%s\"  ->  ok%s\n", COLOR_GREEN, uri, COLOR_RESET);
+		}
+	} else {
+		if (filter_match_any(uri)) {
+			/* If filter matches, prevent page from loading */
+			webkit_network_request_set_uri(req, "about:blank");
+		} 
+	}
 	if(g_str_has_suffix(uri, "/favicon.ico"))
 		webkit_network_request_set_uri(req, "about:blank");
 }
@@ -1220,6 +1238,9 @@ main(int argc, char *argv[]) {
 		break;
 	case 'p':
 		enableplugins = 0;
+		break;
+	case 'l':
+		logurls = 1;
 		break;
 	case 'r':
 		scriptfile = EARGF(usage());
