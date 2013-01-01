@@ -170,7 +170,7 @@ int	matchstar(int, const char*, const char*);
 
 int filter_load();
 int filter_match(const char *s, unsigned int idx);
-int filter_match_any(const char *s);
+char* filter_match_any(const char *s);
 
 char   filterbuf[1024*1024];
 char*  filterstr[1024];
@@ -185,9 +185,10 @@ beforerequest(WebKitWebView *w, WebKitWebFrame *f, WebKitWebResource *r,
 		gpointer d) {
 	const gchar *uri = webkit_network_request_get_uri(req);
 	if (logurls) {
-		if (filter_match_any(uri)) {
+		char * matching = NULL;
+		if ((matching = filter_match_any(uri))) {
 			/* If filter matches, prevent page from loading */
-			printf("%sLoading \"%s\"  ->  blocked%s\n", COLOR_RED, uri, COLOR_RESET);
+			printf("%sLoading \"%s\"  ->  blocked (%s)%s\n", COLOR_RED, uri, matching, COLOR_RESET);
 			webkit_network_request_set_uri(req, "about:blank");
 		} else {
 			printf("%sLoading \"%s\"  ->  ok%s\n", COLOR_GREEN, uri, COLOR_RESET);
@@ -1204,15 +1205,15 @@ int filter_match(const char *s, unsigned int idx)
 }
 
 
-int filter_match_any(const char *s)
+char *filter_match_any(const char *s)
 {
 	int i;
 	for ( i = 0; i < filter_load(); i++ ) {
 		if (match( filterstr[i], s )) {
-			return 1;
+			return filterstr[i];
 		}
 	}
-	return 0;
+	return NULL;
 }
 
 
