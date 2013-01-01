@@ -1078,7 +1078,7 @@ updatewinid(Client *c) {
 static void
 usage(void) {
 	fputs("surf - simple browser\n", stderr);
-	die("usage: surf [-c cookiefile] [-e xid] [-i] [-p] [-r scriptfile]"
+	die("usage: surf [-c cookiefile] [-e xid] [-f filterfile] [-i] [-p] [-r scriptfile]"
 		" [-s] [-t stylefile] [-u useragent] [-v] [-x] [uri]\n");
 }
 
@@ -1211,6 +1211,9 @@ main(int argc, char *argv[]) {
 		break;
 	case 'e':
 		embed = strtol(EARGF(usage()), NULL, 0);
+		break;
+	case 'f':
+		filterfile = EARGF(usage());
 		break;
 	case 'i':
 		loadimages = 0;
