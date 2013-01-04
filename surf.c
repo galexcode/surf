@@ -594,14 +594,21 @@ loaduri(Client *c, const Arg *arg) {
 	if(strcmp(uri, "") == 0)
 		return;
 
-	/* In case it's a file path. */
-	if(uri[0] == '/') {
-		rp = realpath(uri, NULL);
-		u = g_strdup_printf("file://%s", rp);
-		free(rp);
+	/* If it is already a uri */
+	if (g_strrstr(uri, "://")) {
+		u = g_strdup(uri);
 	} else {
-		u = g_strrstr(uri, "://") ? g_strdup(uri)
-			: g_strdup_printf("http://%s", uri);
+		/* Check if it is a local file. */
+		FILE* f = fopen(uri, "r");
+		if(f) {
+			fclose(f);
+			rp = realpath(uri, NULL);
+			u = g_strdup_printf("file://%s", rp);
+			free(rp);
+		} else {
+			/* Assume HTTP protocol */
+			u = g_strdup_printf("http://%s", uri);
+		}
 	}
 
 	/* prevents endless loop */
