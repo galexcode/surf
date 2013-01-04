@@ -87,7 +87,7 @@ static Client *clients = NULL;
 static GdkNativeWindow embed = 0;
 static gboolean showxid = FALSE;
 static char winid[64];
-static gboolean loadimages = 1, enableplugins = 1, enablescripts = 1,
+static gboolean loadimages = 1, enableplugins = 0, enablescripts = 1,
 		usingproxy = 0, logurls = 0;
 static char togglestat[5];
 
