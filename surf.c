@@ -186,18 +186,21 @@ beforerequest(WebKitWebView *w, WebKitWebFrame *f, WebKitWebResource *r,
 	const gchar *uri = webkit_network_request_get_uri(req);
 	if (strlen(uri) > 4 && uri[0] == 'd' && uri[1] == 'a' 
 			&& uri[2] == 't' && uri[3] == 'a' && uri[4] == ':') {
-		char* tmp;
-		tmp = g_strdup(uri);
-		if (strlen(tmp) > 22) {
-			tmp[22] = 0;
+		if (logurls) {
+			char* tmp = g_strdup(uri);
+			if (strlen(tmp) > 22) {
+				tmp[22] = 0;
+			}
+			printf("%sLoading data uri (%s...) -> not filtering%s\n",
+					COLOR_BLUE, tmp, COLOR_RESET);
+			g_free(tmp);
 		}
-		printf("%sLoading data uri (%s...) -> not filtering%s\n", COLOR_BLUE, tmp, COLOR_RESET);
-		g_free(tmp);
 	} else if (logurls) {
 		char * matching = NULL;
 		if ((matching = filter_match_any(uri))) {
 			/* If filter matches, prevent page from loading */
-			printf("%sLoading \"%s\"  ->  blocked (%s)%s\n", COLOR_RED, uri, matching, COLOR_RESET);
+			printf("%sLoading \"%s\"  ->  blocked (%s)%s\n", 
+					COLOR_RED, uri, matching, COLOR_RESET);
 			webkit_network_request_set_uri(req, "about:blank");
 		} else {
 			printf("%sLoading \"%s\"  ->  ok%s\n", COLOR_GREEN, uri, COLOR_RESET);
