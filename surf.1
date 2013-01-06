@@ -5,7 +5,9 @@ surf \- simple webkit-based browser
 .B surf
 .RB [-c\ cookiefile]
 .RB [-e\ xid]
+.RB [-f\ filterfile]
 .RB [-i]
+.RB [-l]
 .RB [-p]
 .RB [-r\ scriptfile]
 .RB [-s]
@@ -27,11 +29,17 @@ Specify the cookiefile to use.
 .B \-e xid
 Reparents to window specified by xid.
 .TP
+.B \-f filterfile 
+Specify the filterfile to use.
+.TP
 .B \-i
-Disable Images
+Disable Images.
+.TP
+.B \-l
+Print URIs and applied filter to stdout.
 .TP
 .B \-p
-Disable Plugins
+Disable Plugins.
 .TP
 .B \-r scriptfile 
 Specify the user scriptfile.
