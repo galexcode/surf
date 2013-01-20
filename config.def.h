@@ -33,11 +33,18 @@ static Bool hidebackground  = FALSE;
 	.v = (char *[]){ "/bin/sh", "-c", \
 	"lxterminal -e \"/bin/sh -c \\\"sed s/^#HttpOnly_// ~/.surf/cookies.txt > \
 		~/.surf/curl_cookies.txt; \
-		curl --cookie ~/.surf/curl_cookies.txt \
-		--user-agent '$1' '$0' --remote-header-name -O; \
-		rm -f ~/.surf/curl_cookies.txt; \
-		echo Hit return...; \
-		read \\\"\"", d, useragent, NULL } }
+		select opt in 'download' 'cancel'; do \
+			if [   \\\"\\$opt\\\" = 'cancel' ]; then \
+				exit; \
+			else \
+				echo 'Starting download…'; \
+				curl --cookie ~/.surf/curl_cookies.txt \
+				--user-agent '$1' '$0' --remote-header-name -O; \
+				rm -f ~/.surf/curl_cookies.txt; \
+				echo Hit return...; \
+				read; exit; \
+			fi; \
+		done \\\"\"", d, useragent, NULL } }
 
 #define MODKEY GDK_CONTROL_MASK
 
