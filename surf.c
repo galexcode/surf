@@ -1101,16 +1101,16 @@ main(int argc, char *argv[]) {
 		embed = strtol(EARGF(usage()), NULL, 0);
 		break;
 	case 'i':
-		loadimages = 0;
+		loadimages = !loadimages;
 		break;
 	case 'p':
-		enableplugins = 0;
+		enableplugins = !enableplugins;
 		break;
 	case 'r':
 		scriptfile = EARGF(usage());
 		break;
 	case 's':
-		enablescripts = 0;
+		enablescripts = !enablescripts;
 		break;
 	case 't':
 		stylefile = EARGF(usage());
