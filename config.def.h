@@ -34,6 +34,7 @@ static Bool hidebackground  = FALSE;
 	.v = (char *[]){ "/bin/sh", "-c", \
 	"lxterminal -e \"/bin/sh -c \\\"sed s/^#HttpOnly_// ~/.surf/cookies.txt > \
 		~/.surf/curl_cookies.txt; \
+		echo '$0'; \
 		select opt in 'download' 'cancel'; do \
 			if [   \\\"\\$opt\\\" = 'cancel' ]; then \
 				exit; \
