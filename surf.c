@@ -842,6 +842,9 @@ processx(GdkXEvent *e, GdkEvent *event, gpointer d) {
 				} else if (strstr((char*) arg.v, "y ") && strlen((char*) arg.v) > 2) {
 					arg.v = g_strdup_printf("http://www.youtube.com/results"
 							"?search_query=%s", ((char*) arg.v)+2);
+				} else if (strstr((char*) arg.v, "i ") && strlen((char*) arg.v) > 2) {
+					arg.v = g_strdup_printf("http://imdb.com/"
+							"find?s=tt&ttype=ft&q=%s", ((char*) arg.v)+2);
 				}
 				loaduri(c, &arg);
 				return GDK_FILTER_REMOVE;
