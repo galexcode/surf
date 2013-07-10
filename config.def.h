@@ -35,8 +35,12 @@ static Bool hidebackground  = FALSE;
 	"lxterminal -e \"/bin/sh -c \\\"sed s/^#HttpOnly_// ~/.surf/cookies.txt > \
 		~/.surf/curl_cookies.txt; \
 		echo '$0'; \
-		select opt in 'download' 'cancel'; do \
+		select opt in 'download' 'evince' 'cancel'; do \
 			if [   \\\"\\$opt\\\" = 'cancel' ]; then \
+				exit; \
+			elif [   \\\"\\$opt\\\" = 'evince' ]; then \
+				echo 'Opening with evince…'; \
+				evince '$0'; \
 				exit; \
 			else \
 				echo 'Starting download…'; \
