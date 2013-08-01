@@ -3,16 +3,12 @@
 surf \- simple webkit-based browser
 .SH SYNOPSIS
 .B surf
+.RB [-bBgGiIkKnNpPsSvx]
 .RB [-c\ cookiefile]
 .RB [-e\ xid]
-.RB [-i]
-.RB [-p]
 .RB [-r\ scriptfile]
-.RB [-s]
 .RB [-t\ stylefile]
 .RB [-u\ useragent]
-.RB [-v]
-.RB [-x]
 .RB "URI"
 .SH DESCRIPTION
 surf is a simple Web browser based on WebKit/GTK+. It is able
@@ -21,29 +17,69 @@ which makes it possible to embed it in another application. Furthermore,
 one can point surf to another URI by setting its XProperties.
 .SH OPTIONS
 .TP
+.B \-b
+Disable Scrollbars
+.TP
+.B \-B
+Enable Scrollbars
+.TP
 .B \-c cookiefile 
-Specify the cookiefile to use.
+Specify the
+.I cookiefile
+to use.
 .TP
 .B \-e xid
-Reparents to window specified by xid.
+Reparents to window specified by
+.I xid.
+.TP
+.B \-g
+Disable giving the geolocation to websites.
+.TP
+.B \-G
+Enable giving the geolocation to websites.
 .TP
 .B \-i
 Toggle auto-loading of images (default: enabled).
 .TP
+.B \-I
+Enable Images
+.TP
+.B \-k
+Disable kiosk mode (disable key strokes and right click)
+.TP
+.B \-K
+Enable kiosk mode (disable key strokes and right click)
+.TP
+.B \-n
+Disable the Web Inspector (Developer Tools).
+.TP
+.B \-N
+Enable the Web Inspector (Developer Tools).
+.TP
 .B \-p
 Toggle the enabling of plugins (default: disabled).
 .TP
+.B \-P
+Enable Plugins
+.TP
 .B \-r scriptfile 
-Specify the user scriptfile.
+Specify the user
+.I scriptfile.
 .TP
 .B \-s
 Toggle JavaScript execution (default: enabled)..
 .TP
+.B \-S
+Enable Javascript
+.TP
 .B \-t stylefile
-Specify the user stylefile.
+Specify the user
+.I stylefile.
 .TP
 .B \-u useragent 
-Specify the useragent which surf should use.
+Specify the
+.I useragent
+which surf should use.
 .TP
 .B \-v
 Prints version information to standard output, then exits.
@@ -88,13 +124,7 @@ Zooms page out
 .B Ctrl\-Shift\-q
 Resets Zoom
 .TP
-.B Ctrl\-h
-Navigate back one step in history.
-.TP
-.B Ctrl\-l
-Navigate forward one step in history.
-.TP
-.B Ctrl\-f and Ctrl\-\\
+.B Ctrl\-f and Ctrl\-\e
 Opens the search-bar.
 .TP
 .B Ctrl\-n
@@ -108,9 +138,6 @@ Opens the URL-bar.
 .TP
 .B Ctrl\-p
 Loads URI from primary selection.
-.TP
-.B Esc
-Stop loading the page.
 .TP
 .B Ctrl\-Shift\-p
 Calls Printpage Dialog.
@@ -127,11 +154,22 @@ Copies current URI to primary selection.
 .B Ctrl\-o
 Show the sourcecode of the current page.
 .TP
+.B Ctrl\-Shift\-b
+Toggle scrollbars
+.TP
 .B Ctrl\-Shift\-c
 Toggle caret browsing.
 .TP
 .B Ctrl\-Shift\-i
 Toggle auto-loading of images.
+.TP
+.B Ctrl\-Shift\-m
+Toggle if the
+.I stylefile 
+file should be loaded.
+.TP
+.B Ctrl\-Shift\-o
+Open the Web Inspector (Developer Tools) window for the current page.
 .TP
 .B Ctrl\-Shift\-s
 Toggle script execution.
@@ -143,7 +181,9 @@ Toggle the enabling of plugins on that surf instance.
 Toggle fullscreen mode.
 .SH ENVIRONMENT
 .B SURF_USERAGENT
-If this variable is set upon startup, surf will use it as the useragent string
+If this variable is set upon startup, surf will use it as the
+.I useragent
+string
 .TP
 .B http_proxy
 If this variable is set and not empty upon startup, surf will use it as the http proxy
