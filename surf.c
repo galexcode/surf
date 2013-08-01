@@ -1323,7 +1323,7 @@ main(int argc, char *argv[]) {
 		allowgeolocation = 1;
 		break;
 	case 'i':
-		loadimages = 0;
+		loadimages = !loadimages;
 		break;
 	case 'I':
 		loadimages = 1;
@@ -1341,7 +1341,7 @@ main(int argc, char *argv[]) {
 		enableinspector = 1;
 		break;
 	case 'p':
-		enableplugins = 0;
+		enableplugins = !enableplugins;
 		break;
 	case 'P':
 		enableplugins = 1;
@@ -1350,7 +1350,7 @@ main(int argc, char *argv[]) {
 		scriptfile = EARGF(usage());
 		break;
 	case 's':
-		enablescripts = 0;
+		enablescripts = !enablescripts;
 		break;
 	case 'S':
 		enablescripts = 1;
