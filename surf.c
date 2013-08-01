@@ -33,6 +33,14 @@ char *argv0;
 #define COOKIEJAR_TYPE          (cookiejar_get_type ())
 #define COOKIEJAR(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), COOKIEJAR_TYPE, CookieJar))
 
+#define COLOR_RED     "\x1b[31m"
+#define COLOR_GREEN   "\x1b[32m"
+#define COLOR_YELLOW  "\x1b[33m"
+#define COLOR_BLUE    "\x1b[34m"
+#define COLOR_MAGENTA "\x1b[35m"
+#define COLOR_CYAN    "\x1b[36m"
+#define COLOR_RESET   "\x1b[0m"
+
 enum { AtomFind, AtomGo, AtomUri, AtomLast };
 
 typedef union Arg Arg;
@@ -77,6 +85,7 @@ static Client *clients = NULL;
 static GdkNativeWindow embed = 0;
 static gboolean showxid = FALSE;
 static char winid[64];
+static gboolean logurls = 0;
 static gboolean usingproxy = 0;
 static char togglestat[7];
 static char pagestat[3];
@@ -171,6 +180,22 @@ static void windowobjectcleared(GtkWidget *w, WebKitWebFrame *frame,
 		JSContextRef js, JSObjectRef win, Client *c);
 static void zoom(Client *c, const Arg *arg);
 
+/* Filter and matching functions */
+
+int	match(const char*, const char*);
+int	matchhere(const char*, const char*);
+int	matchstar(int, const char*, const char*);
+
+int filter_load();
+int filter_match(const char *s, unsigned int idx, int isregexp);
+char* filter_match_any(const char *s);
+
+char   filterbuf[1024*1024];
+char*  filterstr[1024];
+char*  filterregexp[1024];
+int    filterstrlen = 0;
+int    filterregexplen = 0;
+
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
@@ -193,9 +218,38 @@ beforerequest(WebKitWebView *w, WebKitWebFrame *f, WebKitWebResource *r,
 		WebKitNetworkRequest *req, WebKitNetworkResponse *resp,
 		gpointer d) {
 	const gchar *uri = webkit_network_request_get_uri(req);
-
-	if(g_str_has_suffix(uri, "/favicon.ico"))
+	/* We don't need favicons, so don't load them */
+	if (g_str_has_suffix(uri, "/favicon.ico")) {
 		webkit_network_request_set_uri(req, "about:blank");
+	
+	/* Don't filter data://... */
+	} else if (strlen(uri) > 4 && uri[0] == 'd' && uri[1] == 'a' 
+			&& uri[2] == 't' && uri[3] == 'a' && uri[4] == ':') {
+		if (logurls) {
+			char* tmp = g_strdup(uri);
+			if (strlen(tmp) > 22) {
+				tmp[22] = 0;
+			}
+			printf("%sLoading data uri (%s...) -> not filtering%s\n",
+					COLOR_BLUE, tmp, COLOR_RESET);
+			g_free(tmp);
+		}
+	} else if (logurls) {
+		char * matching = NULL;
+		if ((matching = filter_match_any(uri))) {
+			/* If filter matches, prevent page from loading */
+			printf("%sLoading \"%s\"  ->  blocked (%s)%s\n", 
+					COLOR_RED, uri, matching, COLOR_RESET);
+			webkit_network_request_set_uri(req, "about:blank");
+		} else {
+			printf("%sLoading \"%s\"  ->  ok%s\n", COLOR_GREEN, uri, COLOR_RESET);
+		}
+	} else {
+		if (filter_match_any(uri)) {
+			/* If filter matches, prevent page from loading */
+			webkit_network_request_set_uri(req, "about:blank");
+		} 
+	}
 }
 
 static char *
@@ -1270,8 +1324,8 @@ updatewinid(Client *c) {
 
 static void
 usage(void) {
-	die("usage: %s [-biknpsvx] [-c cookiefile] [-e xid] [-r scriptfile]"
-		" [-t stylefile] [-u useragent] [uri]\n", basename(argv0));
+	die("usage: %s [-biklnpsvx] [-c cookiefile] [-e xid] [-f filterfile]"
+		"[-r scriptfile] [-t stylefile] [-u useragent] [uri]\n", basename(argv0));
 }
 
 static void
@@ -1296,6 +1350,124 @@ zoom(Client *c, const Arg *arg) {
 	}
 }
 
+
+/* matchhere: search for regexp at beginning of text */
+int matchhere(const char *regexp, const char *text)
+{
+	if (regexp[0] == '\0')
+		return 1;
+	if (regexp[1] == '*')
+		return matchstar(regexp[0], regexp+2, text);
+	if (regexp[0] == '$' && regexp[1] == '\0')
+		return *text == '\0';
+	if (*text!='\0' && (regexp[0]=='.' || regexp[0]==*text))
+		return matchhere(regexp+1, text+1);
+	return 0;
+}
+
+
+/* match: search for regexp anywhere in text */
+int match(const char *regexp, const char *text)
+{
+	if (regexp[0] == '^')
+		return matchhere(regexp+1, text);
+	do {	/* must look even if string is empty */
+		if (matchhere(regexp, text))
+			return 1;
+	} while (*text++ != '\0');
+	return 0;
+}
+
+
+/* matchstar: search for c*regexp at beginning of text */
+int matchstar(int c, const char *regexp, const char *text)
+{
+	do {	/* a * matches zero or more instances */
+		if (matchhere(regexp, text))
+			return 1;
+	} while (*text != '\0' && (*text++ == c || c == '.'));
+	return 0;
+}
+
+
+int filter_load()
+{
+	/** 
+	 * If filter are already loaded 
+	 * return the amount of filters.
+	 **/
+	if (filterstrlen || filterregexplen) {
+		return 1;
+	}
+	filterstrlen = 0;
+	filterregexplen = 0;
+	/* Otherwise read them from filterfile. */
+	FILE* f = fopen(buildpath(filterfile), "r");
+	if (!f) {
+		return 0;
+	}
+	char buf[1024];
+	char* bufpos = filterbuf;
+	while ( fgets(buf, 1024, f) ) {
+		/* Remove newline characters */
+		if (strlen(buf) && buf[strlen(buf)-1] == '\n') {
+			buf[strlen(buf)-1] = 0;
+		}
+		/* Remove empty lines and comments. */
+		if (!strlen(buf) || buf[0] == '#') {
+			continue;
+		}
+		/* Determine if string is regexp or normal string. We tread strings which
+		 * start with | as regular expressions as the | character should not be
+		 * part of any url. */
+		if (buf[0] == '|') {
+			strcpy( bufpos, buf+1 ); /* We won't copy the | character */
+			filterregexp[filterregexplen] = bufpos;
+			filterregexplen++;
+		} else {
+			strcpy( bufpos, buf ); 
+			filterstr[filterstrlen] = bufpos;
+			filterstrlen++;
+		}
+		bufpos += strlen(buf) + 1;
+	}
+	fclose(f);
+	return 1;
+}
+
+
+int filter_match(const char *s, unsigned int idx, int isregexp)
+{
+	/* Make sure filter is loaded */
+	filter_load();
+	/* Handle RegExp */
+	if (isregexp) {
+		return (idx >= filterregexplen) ? 0 : match( filterregexp[idx], s );
+	}
+	/* Handle normal substring */
+	return (idx < filterstrlen) && g_strrstr(s, filterstr[idx]) ? 1 : 0;
+}
+
+
+char *filter_match_any(const char *s)
+{
+	/* Make sure filter is loaded */
+	filter_load();
+	int i;
+	for ( i = 0; i < filterstrlen; i++ ) {
+		if (g_strrstr(s, filterstr[i])) {
+			return filterstr[i];
+		}
+	}
+	for ( i = 0; i < filterregexplen; i++ ) {
+		if (match( filterregexp[i], s )) {
+			return filterregexp[i];
+		}
+	}
+	return NULL;
+}
+
+
 int
 main(int argc, char *argv[]) {
 	Arg arg;
@@ -1316,6 +1488,9 @@ main(int argc, char *argv[]) {
 	case 'e':
 		embed = strtol(EARGF(usage()), NULL, 0);
 		break;
+	case 'f':
+		filterfile = EARGF(usage());
+		break;
 	case 'g':
 		allowgeolocation = 0;
 		break;
@@ -1333,6 +1508,9 @@ main(int argc, char *argv[]) {
 		break;
 	case 'K':
 		kioskmode = 1;
+		break;
+	case 'l':
+		logurls = 1;
 		break;
 	case 'n':
 		enableinspector = 0;

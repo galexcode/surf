@@ -3,9 +3,10 @@
 surf \- simple webkit-based browser
 .SH SYNOPSIS
 .B surf
-.RB [-bBgGiIkKnNpPsSvx]
+.RB [-bBgGiIkKlnNpPsSvx]
 .RB [-c\ cookiefile]
 .RB [-e\ xid]
+.RB [-f\ filterfile]
 .RB [-r\ scriptfile]
 .RB [-t\ stylefile]
 .RB [-u\ useragent]
@@ -38,8 +39,11 @@ Disable giving the geolocation to websites.
 .B \-G
 Enable giving the geolocation to websites.
 .TP
+.B \-f filterfile 
+Specify the filterfile to use.
+.TP
 .B \-i
-Toggle auto-loading of images (default: enabled).
+Disable Images.
 .TP
 .B \-I
 Enable Images
@@ -50,6 +54,9 @@ Disable kiosk mode (disable key strokes and right click)
 .B \-K
 Enable kiosk mode (disable key strokes and right click)
 .TP
+.B \-l
+Print URIs and applied filter to stdout.
+.TP
 .B \-n
 Disable the Web Inspector (Developer Tools).
 .TP
@@ -57,7 +64,7 @@ Disable the Web Inspector (Developer Tools).
 Enable the Web Inspector (Developer Tools).
 .TP
 .B \-p
-Toggle the enabling of plugins (default: disabled).
+Disable Plugins.
 .TP
 .B \-P
 Enable Plugins
