@@ -15,14 +15,14 @@ static Bool zoomto96dpi     = TRUE;  /* Zoom pages to always emulate 96dpi */
 static guint defaultfontsize = 12;
 
 /* Webkit default features */
-static Bool enablescrollbars = TRUE;
+static Bool enablescrollbars      = TRUE;
 static Bool enablespatialbrowsing = TRUE;
-static Bool enableplugins = TRUE;
-static Bool enablescripts = TRUE;
-static Bool enableinspector = TRUE;
-static Bool loadimages = TRUE;
-static Bool hidebackground  = FALSE;
-static Bool allowgeolocation = TRUE;
+static Bool enableplugins         = FALSE;
+static Bool enablescripts         = TRUE;
+static Bool enableinspector       = TRUE;
+static Bool loadimages            = TRUE;
+static Bool hidebackground        = FALSE;
+static Bool allowgeolocation      = TRUE;
 
 #define SETPROP(p, q) { \
 	.v = (char *[]){ "/bin/sh", "-c", \
