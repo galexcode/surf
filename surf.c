@@ -179,6 +179,7 @@ static void usage(void);
 static void windowobjectcleared(GtkWidget *w, WebKitWebFrame *frame,
 		JSContextRef js, JSObjectRef win, Client *c);
 static void zoom(Client *c, const Arg *arg);
+static void external(Client *c, const Arg *arg);
 
 /* Filter and matching functions */
 
@@ -1494,6 +1495,25 @@ char *filter_match_any(const char *s)
 	return NULL;
 }
 
+
+void
+external(Client *c, const Arg *arg) {
+	const char * uri = geturi(c);
+	printf("%s\n", uri);
+
+	char y_str_a[25] = "http://youtube.com/watch";
+	char y_str_b[29] = "http://www.youtube.com/watch";
+	if ( strcmp( uri, y_str_a ) > 0 || strcmp( uri, y_str_b ) > 0 ) {
+		int p = fork();
+		if ( !p ) {
+			char cmd[4096];
+			sprintf( cmd, "quvi -vm -e-v -f best  --exec \"echo %%t\"  --exec '/usr/bin/mplayer %%u' '%s'", uri );
+			printf( "%s\n", cmd );
+			system( cmd );
+			exit(0);
+		}
+	}
+}
 
 int
 main(int argc, char *argv[]) {

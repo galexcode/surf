@@ -104,6 +104,10 @@ static Key keys[] = {
     { MODKEY|GDK_SHIFT_MASK,GDK_i,      toggle,     { .v = "auto-load-images" } },
     { MODKEY|GDK_SHIFT_MASK,GDK_s,      toggle,     { .v = "enable-scripts" } },
     { MODKEY|GDK_SHIFT_MASK,GDK_v,      toggle,     { .v = "enable-plugins" } },
+
+	 /* Play youtube videos in mplayer, etc. */
+	 { MODKEY,               GDK_e,      external,   { 0 } },
+
     { MODKEY|GDK_SHIFT_MASK,GDK_m,      togglestyle,{ 0 } },
     { MODKEY|GDK_SHIFT_MASK,GDK_b,      togglescrollbars,{ 0 } },
     { MODKEY|GDK_SHIFT_MASK,GDK_g,      togglegeolocation, { 0 } },
