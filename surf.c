@@ -920,7 +920,7 @@ newclient(void) {
 static void
 newwindow(Client *c, const Arg *arg, gboolean noembed) {
 	guint i = 0;
-	const char *cmd[14], *uri;
+	const char *cmd[15], *uri;
 	const Arg a = { .v = (void *)cmd };
 	char tmp[64];
 
@@ -942,6 +942,8 @@ newwindow(Client *c, const Arg *arg, gboolean noembed) {
 		cmd[i++] = "-s";
 	if(showxid)
 		cmd[i++] = "-x";
+	if(logurls)
+		cmd[i++] = "-l";
 	cmd[i++] = "-c";
 	cmd[i++] = cookiefile;
 	cmd[i++] = "--";
