@@ -417,8 +417,15 @@ copystr(char **str, const char *src) {
 
 static WebKitWebView *
 createwindow(WebKitWebView  *v, WebKitWebFrame *f, Client *c) {
+
+	Arg arg = {.v = NULL };
+	newwindow(c, &arg, 1);
+
+	/*
 	Client *n = newclient();
 	return n->view;
+	*/
+	return NULL;
 }
 
 static gboolean
